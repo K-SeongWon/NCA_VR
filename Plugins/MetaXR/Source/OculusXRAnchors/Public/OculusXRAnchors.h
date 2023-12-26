@@ -13,7 +13,8 @@ LICENSE file in the root directory of this source tree.
 
 DECLARE_DELEGATE_TwoParams(FOculusXRSpatialAnchorCreateDelegate, EOculusXRAnchorResult::Type /*Result*/, UOculusXRAnchorComponent* /*Anchor*/);
 DECLARE_DELEGATE_TwoParams(FOculusXRAnchorEraseDelegate, EOculusXRAnchorResult::Type /*Result*/, FOculusXRUUID /*AnchorUUID*/);
-DECLARE_DELEGATE_FourParams(FOculusXRAnchorSetComponentStatusDelegate, EOculusXRAnchorResult::Type /*Result*/, uint64 /*AnchorHandle*/, EOculusXRSpaceComponentType /*ComponentType*/, bool /*Enabled*/);
+DECLARE_DELEGATE_FourParams(FOculusXRAnchorSetComponentStatusDelegate, EOculusXRAnchorResult::Type /*Result*/, UOculusXRAnchorComponent* /*Anchor*/, EOculusXRSpaceComponentType /*ComponentType*/, bool /*Enabled*/);
+DECLARE_DELEGATE_ThreeParams(FOculusXRAnchorSetAnchorComponentStatusDelegate, EOculusXRAnchorResult::Type /*Result*/, uint64 /*Space*/, EOculusXRSpaceComponentType /*ComponentType*/);
 DECLARE_DELEGATE_TwoParams(FOculusXRAnchorSaveDelegate, EOculusXRAnchorResult::Type /*Result*/, UOculusXRAnchorComponent* /*Anchor*/);
 DECLARE_DELEGATE_TwoParams(FOculusXRAnchorSaveListDelegate, EOculusXRAnchorResult::Type /*Result*/, const TArray<UOculusXRAnchorComponent*>& /*SavedAnchors*/);
 DECLARE_DELEGATE_TwoParams(FOculusXRAnchorQueryDelegate, EOculusXRAnchorResult::Type /*Result*/, const TArray<FOculusXRSpaceQueryResult>& /*Results*/);
@@ -35,11 +36,8 @@ namespace OculusXRAnchors
 
 		static bool SetAnchorComponentStatus(UOculusXRAnchorComponent* Anchor, EOculusXRSpaceComponentType SpaceComponentType, bool Enable, float Timeout, const FOculusXRAnchorSetComponentStatusDelegate& ResultCallback, EOculusXRAnchorResult::Type& OutResult);
 		static bool GetAnchorComponentStatus(UOculusXRAnchorComponent* Anchor, EOculusXRSpaceComponentType SpaceComponentType, bool& OutEnabled, bool& OutChangePending, EOculusXRAnchorResult::Type& OutResult);
-		static bool GetAnchorSupportedComponents(UOculusXRAnchorComponent* Anchor, TArray<EOculusXRSpaceComponentType>& OutSupportedComponents, EOculusXRAnchorResult::Type& OutResult);
 
-		static bool SetComponentStatus(uint64 Space, EOculusXRSpaceComponentType SpaceComponentType, bool Enable, float Timeout, const FOculusXRAnchorSetComponentStatusDelegate& ResultCallback, EOculusXRAnchorResult::Type& OutResult);
-		static bool GetComponentStatus(uint64 AnchorHandle, EOculusXRSpaceComponentType SpaceComponentType, bool& OutEnabled, bool& OutChangePending, EOculusXRAnchorResult::Type& OutResult);
-		static bool GetSupportedComponents(uint64 AnchorHandle, TArray<EOculusXRSpaceComponentType>& OutSupportedComponents, EOculusXRAnchorResult::Type& OutResult);
+		static bool SetComponentStatus(uint64 Space, EOculusXRSpaceComponentType SpaceComponentType, bool Enable, float Timeout, const FOculusXRAnchorSetAnchorComponentStatusDelegate& ResultCallback, EOculusXRAnchorResult::Type& OutResult);
 
 		static bool SaveAnchor(UOculusXRAnchorComponent* Anchor, EOculusXRSpaceStorageLocation StorageLocation, const FOculusXRAnchorSaveDelegate& ResultCallback, EOculusXRAnchorResult::Type& OutResult);
 		static bool SaveAnchorList(const TArray<UOculusXRAnchorComponent*>& Anchors, EOculusXRSpaceStorageLocation StorageLocation, const FOculusXRAnchorSaveListDelegate& ResultCallback, EOculusXRAnchorResult::Type& OutResult);
@@ -83,7 +81,15 @@ namespace OculusXRAnchors
 		{
 			FOculusXRUInt64 RequestId;
 			FOculusXRAnchorSetComponentStatusDelegate Binding;
-			uint64 AnchorHandle;
+			TWeakObjectPtr<UOculusXRAnchorComponent> Anchor;
+		};
+
+		struct SetAnchorComponentStatusBinding
+		{
+			FOculusXRUInt64 RequestId;
+			FOculusXRAnchorSetAnchorComponentStatusDelegate Binding;
+			uint64 Space;
+			EOculusXRSpaceComponentType ComponentType;
 		};
 
 		struct CreateAnchorBinding
@@ -130,6 +136,7 @@ namespace OculusXRAnchors
 		TMap<uint64, CreateAnchorBinding> CreateSpatialAnchorBindings;
 		TMap<uint64, EraseAnchorBinding> EraseAnchorBindings;
 		TMap<uint64, SetComponentStatusBinding> SetComponentStatusBindings;
+		TMap<uint64, SetAnchorComponentStatusBinding> SetAnchorComponentStatusBindings;
 		TMap<uint64, SaveAnchorBinding> AnchorSaveBindings;
 		TMap<uint64, SaveAnchorListBinding> AnchorSaveListBindings;
 		TMap<uint64, AnchorQueryBinding> AnchorQueryBindings;

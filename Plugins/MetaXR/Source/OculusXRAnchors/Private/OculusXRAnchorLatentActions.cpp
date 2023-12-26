@@ -334,7 +334,7 @@ void UOculusXRAsyncAction_QueryAnchors::HandleQueryAnchorsResults(EOculusXRAncho
 }
 
 //
-// Set Component Status with Anchor Actor
+// Set Component Status
 //
 void UOculusXRAsyncAction_SetAnchorComponentStatus::Activate()
 {
@@ -346,8 +346,8 @@ void UOculusXRAsyncAction_SetAnchorComponentStatus::Activate()
 		return;
 	}
 
-	TargetAnchorComponent = TargetActor->FindComponentByClass<UOculusXRAnchorComponent>();
-	if (TargetAnchorComponent == nullptr)
+	UOculusXRAnchorComponent* AnchorComponent = TargetActor->FindComponentByClass<UOculusXRAnchorComponent>();
+	if (AnchorComponent == nullptr)
 	{
 		Failure.Broadcast(EOculusXRAnchorResult::Failure);
 		return;
@@ -355,7 +355,7 @@ void UOculusXRAsyncAction_SetAnchorComponentStatus::Activate()
 
 	EOculusXRAnchorResult::Type Result;
 	bool bStartedAsync = OculusXRAnchors::FOculusXRAnchors::SetAnchorComponentStatus(
-		TargetAnchorComponent,
+		AnchorComponent,
 		ComponentType,
 		bEnabled,
 		0,
@@ -389,11 +389,11 @@ UOculusXRAsyncAction_SetAnchorComponentStatus* UOculusXRAsyncAction_SetAnchorCom
 	return Action;
 }
 
-void UOculusXRAsyncAction_SetAnchorComponentStatus::HandleSetComponentStatusComplete(EOculusXRAnchorResult::Type SetStatusResult, uint64 AnchorHandle, EOculusXRSpaceComponentType SpaceComponentType, bool bResultEnabled)
+void UOculusXRAsyncAction_SetAnchorComponentStatus::HandleSetComponentStatusComplete(EOculusXRAnchorResult::Type SetStatusResult, UOculusXRAnchorComponent* Anchor, EOculusXRSpaceComponentType SpaceComponentType, bool bResultEnabled)
 {
 	if (UOculusXRAnchorBPFunctionLibrary::IsAnchorResultSuccess(SetStatusResult))
 	{
-		Success.Broadcast(TargetAnchorComponent, SpaceComponentType, bResultEnabled, SetStatusResult);
+		Success.Broadcast(Anchor, SpaceComponentType, bResultEnabled, SetStatusResult);
 	}
 	else
 	{
@@ -404,7 +404,7 @@ void UOculusXRAsyncAction_SetAnchorComponentStatus::HandleSetComponentStatusComp
 }
 
 //
-// Set Component Status
+// Set Scene Component Status
 //
 void UOculusXRAsyncAction_SetComponentStatus::Activate()
 {
@@ -414,7 +414,7 @@ void UOculusXRAsyncAction_SetComponentStatus::Activate()
 		Component->GetType(),
 		bEnabled,
 		0,
-		FOculusXRAnchorSetComponentStatusDelegate::CreateUObject(this, &UOculusXRAsyncAction_SetComponentStatus::HandleSetComponentStatusComplete),
+		FOculusXRAnchorSetAnchorComponentStatusDelegate::CreateUObject(this, &UOculusXRAsyncAction_SetComponentStatus::HandleSetComponentStatusComplete),
 		Result);
 
 	if (!bStartedAsync)
@@ -436,7 +436,7 @@ UOculusXRAsyncAction_SetComponentStatus* UOculusXRAsyncAction_SetComponentStatus
 	return Action;
 }
 
-void UOculusXRAsyncAction_SetComponentStatus::HandleSetComponentStatusComplete(EOculusXRAnchorResult::Type SetStatusResult, uint64 AnchorHandle, EOculusXRSpaceComponentType SpaceComponentType, bool bResultEnabled)
+void UOculusXRAsyncAction_SetComponentStatus::HandleSetComponentStatusComplete(EOculusXRAnchorResult::Type SetStatusResult, uint64 Space, EOculusXRSpaceComponentType SpaceComponentType)
 {
 	if (UOculusXRAnchorBPFunctionLibrary::IsAnchorResultSuccess(SetStatusResult))
 	{

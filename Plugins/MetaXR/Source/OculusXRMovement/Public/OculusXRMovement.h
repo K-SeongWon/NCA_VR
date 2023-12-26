@@ -7,7 +7,6 @@ LICENSE file in the root directory of this source tree.
 
 #pragma once
 
-#include "OculusXRHMD.h"
 #include "OculusXRMovementTypes.h"
 
 struct OCULUSXRMOVEMENT_API OculusXRMovement
@@ -17,13 +16,6 @@ struct OCULUSXRMOVEMENT_API OculusXRMovement
 	static bool IsBodyTrackingSupported();
 	static bool StartBodyTracking();
 	static bool StopBodyTracking();
-	static bool StartBodyTrackingByJointSet(EOculusXRBodyJointSet jointSet);
-	static bool RequestBodyTrackingFidelity(EOculusXRBodyTrackingFidelity fidelity);
-	static bool ResetBodyTrackingCalibration();
-	static bool SuggestBodyTrackingCalibrationOverride(float height);
-
-private:
-	static bool IsFullBodyTrackingEnabled();
 
 public:
 	static bool GetFaceState(FOculusXRFaceState& outOculusXRFaceState);

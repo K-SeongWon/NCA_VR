@@ -207,14 +207,11 @@ public:
 	UPROPERTY(Transient)
 	AActor* TargetActor;
 
-	UPROPERTY(Transient)
-	UOculusXRAnchorComponent* TargetAnchorComponent;
-
 	EOculusXRSpaceComponentType ComponentType;
 	bool bEnabled;
 
 private:
-	void HandleSetComponentStatusComplete(EOculusXRAnchorResult::Type SetStatusResult, uint64 AnchorHandle, EOculusXRSpaceComponentType SpaceComponentType, bool bResultEnabled);
+	void HandleSetComponentStatusComplete(EOculusXRAnchorResult::Type SetStatusResult, UOculusXRAnchorComponent* Anchor, EOculusXRSpaceComponentType SpaceComponentType, bool bResultEnabled);
 };
 
 //
@@ -242,7 +239,7 @@ public:
 	bool bEnabled;
 
 private:
-	void HandleSetComponentStatusComplete(EOculusXRAnchorResult::Type SetStatusResult, uint64 AnchorHandle, EOculusXRSpaceComponentType SpaceComponentType, bool bResultEnabled);
+	void HandleSetComponentStatusComplete(EOculusXRAnchorResult::Type SetStatusResult, uint64 Space, EOculusXRSpaceComponentType SpaceComponentType);
 };
 
 //

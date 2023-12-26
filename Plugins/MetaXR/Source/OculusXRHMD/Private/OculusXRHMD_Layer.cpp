@@ -1221,10 +1221,6 @@ namespace OculusXRHMD
 			}
 
 #ifdef WITH_OCULUS_BRANCH
-			if (Desc.Flags & IStereoLayers::LAYER_FLAG_AUTO_FILTERING)
-			{
-				OvrpLayerSubmit.LayerSubmitFlags |= ovrpLayerSubmitFlag_AutoLayerFilter;
-			}
 			if (Desc.Flags & IStereoLayers::LAYER_FLAG_NORMAL_SUPERSAMPLE)
 			{
 				OvrpLayerSubmit.LayerSubmitFlags |= ovrpLayerSubmitFlag_EfficientSuperSample;
@@ -1271,10 +1267,7 @@ namespace OculusXRHMD
 			ovrpXrApi NativeXrApi;
 			if (OVRP_SUCCESS(FOculusXRHMDModule::GetPluginWrapper().GetNativeXrApiType(&NativeXrApi)) && (NativeXrApi == ovrpXrApi_OpenXR))
 			{
-
-				const bool bShouldIgnoreSrcAlpha = (LayerIndex == 0 && Settings->SystemSplashBackground == ESystemSplashBackgroundType::Black);
-
-				if (bShouldIgnoreSrcAlpha)
+				if (LayerIndex == 0)
 				{
 					OvrpLayerSubmit.LayerSubmitFlags |= ovrpLayerSubmitFlag_IgnoreSourceAlpha;
 				}

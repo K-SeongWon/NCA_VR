@@ -857,13 +857,10 @@ EVisibility SOculusToolWidget::MobileShaderStaticAndCSMShadowReceiversVisibility
 
 	for (const auto& kvp : DynamicLights)
 	{
-		if (kvp.Value.IsValid())
+		AActor* owner = kvp.Value->GetOwner();
+		if (owner != nullptr && owner->IsRootComponentStationary())
 		{
-			AActor* owner = kvp.Value->GetOwner();
-			if (owner != nullptr && owner->IsRootComponentStationary())
-			{
-				return EVisibility::Collapsed;
-			}
+			return EVisibility::Collapsed;
 		}
 	}
 
@@ -889,13 +886,10 @@ EVisibility SOculusToolWidget::MobileShaderAllowDistanceFieldShadowsVisibility(F
 
 	for (const auto& kvp : DynamicLights)
 	{
-		if (kvp.Value.IsValid())
+		AActor* owner = kvp.Value->GetOwner();
+		if (owner != nullptr && owner->IsRootComponentStationary())
 		{
-			AActor* owner = kvp.Value->GetOwner();
-			if (owner != nullptr && owner->IsRootComponentStationary())
-			{
-				return EVisibility::Collapsed;
-			}
+			return EVisibility::Collapsed;
 		}
 	}
 
@@ -921,13 +915,10 @@ EVisibility SOculusToolWidget::MobileShaderAllowMovableDirectionalLightsVisibili
 
 	for (const auto& kvp : DynamicLights)
 	{
-		if (kvp.Value.IsValid())
+		AActor* owner = kvp.Value->GetOwner();
+		if (owner != nullptr && owner->IsRootComponentMovable())
 		{
-			AActor* owner = kvp.Value->GetOwner();
-			if (owner != nullptr && owner->IsRootComponentMovable())
-			{
-				return EVisibility::Collapsed;
-			}
+			return EVisibility::Collapsed;
 		}
 	}
 
@@ -981,7 +972,7 @@ EVisibility SOculusToolWidget::LensFlareVisibility(FName tag) const
 FReply SOculusToolWidget::SelectLight(FString lightName)
 {
 	const TWeakObjectPtr<ULightComponentBase>* weakPtr = DynamicLights.Find(lightName);
-	if (weakPtr->IsValid())
+	if (weakPtr)
 	{
 		ULightComponentBase* light = weakPtr->Get();
 		GEditor->SelectNone(true, true);

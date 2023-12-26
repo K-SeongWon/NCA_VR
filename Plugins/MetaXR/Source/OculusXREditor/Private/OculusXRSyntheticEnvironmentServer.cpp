@@ -2,7 +2,6 @@
 
 #include "OculusXRSyntheticEnvironmentServer.h"
 #include "OculusXRHMDRuntimeSettings.h"
-#include "OculusXRTelemetryEditorEvents.h"
 #include "Misc/MessageDialog.h"
 
 #include "Windows/WindowsPlatformMisc.h"
@@ -54,26 +53,22 @@ void FMetaXRSES::StopServer()
 
 void FMetaXRSES::LaunchEnvironment(FString EnvironmentName)
 {
-	OculusXRTelemetry::TScopedMarker<OculusXRTelemetry::Events::FSimulator> Event;
 	FString SESPath = GetSynthEnvServerPath();
-	const bool bLaunched = LaunchProcess(SESPath, EnvironmentName, LocalSharingServer, EnvProcHandle);
-	const auto& _ = Event.SetResult(bLaunched ? OculusXRTelemetry::EAction::Success : OculusXRTelemetry::EAction::Fail).AddAnnotation("launch", StringCast<ANSICHAR>(*EnvironmentName).Get());
+	LaunchProcess(SESPath, EnvironmentName, LocalSharingServer, EnvProcHandle);
 }
 
 void FMetaXRSES::LaunchLocalSharingServer()
 {
-	OculusXRTelemetry::TScopedMarker<OculusXRTelemetry::Events::FSimulator> Event;
 	FString LSSPath = GetLocalSharingServerPath();
-	const bool bLaunched = LaunchProcess(LSSPath, "", LocalSharingServer, LSSProcHandle);
-	const auto& _ = Event.SetResult(bLaunched ? OculusXRTelemetry::EAction::Success : OculusXRTelemetry::EAction::Fail).AddAnnotation("launch", "localsharingserver");
+	LaunchProcess(LSSPath, "", LocalSharingServer, LSSProcHandle);
 }
 
-bool FMetaXRSES::LaunchProcess(FString BinaryPath, FString Arguments, FString LogContext, FProcHandle& OutProcHandle)
+void FMetaXRSES::LaunchProcess(FString BinaryPath, FString Arguments, FString LogContext, FProcHandle& OutProcHandle)
 {
 	if (!IFileManager::Get().FileExists(*BinaryPath))
 	{
 		UE_LOG(LogMetaXRSES, Error, TEXT("Failed to find %s."), *BinaryPath);
-		return false;
+		return;
 	}
 	UE_LOG(LogMetaXRSES, Log, TEXT("Launching %s."), *BinaryPath);
 
@@ -83,11 +78,10 @@ bool FMetaXRSES::LaunchProcess(FString BinaryPath, FString Arguments, FString Lo
 	{
 		UE_LOG(LogMetaXRSES, Error, TEXT("Failed to launch %s."), *BinaryPath);
 		FPlatformProcess::CloseProc(OutProcHandle);
-		return false;
+		return;
 	}
 
 	UE_LOG(LogMetaXRSES, Log, TEXT("Launched %s."), *BinaryPath);
-	return true;
 }
 
 void FMetaXRSES::StopProcess(FProcHandle& ProcHandle, FString LogContext)

@@ -25,7 +25,6 @@ namespace OculusXRHMD
 		, FoveatedRenderingLevel(EOculusXRFoveatedRenderingLevel::Off)
 		, bDynamicFoveatedRendering(true)
 		, bSupportEyeTrackedFoveatedRendering(false)
-		, SystemSplashBackground(ESystemSplashBackgroundType::Black)
 		, XrApi(EOculusXRXrApi::OVRPluginOpenXR)
 		, ColorSpace(EOculusXRColorSpace::P3)
 		, ControllerPoseAlignment(EOculusXRControllerPoseAlignment::Default)
@@ -39,8 +38,6 @@ namespace OculusXRHMD
 		, bLateLatching(false)
 		, bSupportExperimentalFeatures(false)
 		, ProcessorFavor(EProcessorFavor::FavorEqually)
-		, BodyTrackingFidelity(EOculusXRHMDBodyTrackingFidelity::Low)
-		, BodyTrackingJointSet(EOculusXRHMDBodyJointSet::UpperBody)
 	{
 		Flags.Raw = 0;
 		Flags.bHMDEnabled = true;
@@ -72,11 +69,6 @@ namespace OculusXRHMD
 
 		RenderTargetSize = FIntPoint(0, 0);
 
-#ifdef WITH_OCULUS_BRANCH
-		Flags.bTileTurnOffEnabled = false;
-#else
-		Flags.bTileTurnOffEnabled = true;
-#endif
 	}
 
 	TSharedPtr<FSettings, ESPMode::ThreadSafe> FSettings::Clone() const
